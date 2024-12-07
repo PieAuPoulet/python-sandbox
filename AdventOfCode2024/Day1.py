@@ -1,0 +1,1 @@
+print("Im going to solve the advent calendar of code 2024")
