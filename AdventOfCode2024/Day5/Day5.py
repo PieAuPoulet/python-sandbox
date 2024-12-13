@@ -58,8 +58,10 @@ def part2():
         pages = line.split(',')
         already_seen = {}
         correct = True
-        print(pages)
-        for i in range(0, len(pages)):
+        was_correct = True
+        #print(pages)
+        i = 0
+        while i < len(pages):
             l = rules_dict.get(pages[i], None)
             if l is not None:
                 for c in l:
@@ -68,13 +70,19 @@ def part2():
                         tmp = pages[i]
                         pages[i] = c
                         pages[c_index] = tmp
-                        print("   {0}".format(pages))
-                        result = result + int(pages[len(pages) // 2])
+                        #print("   {0}".format(pages))
                         correct = False
+                        was_correct = False
                         break
-            if not correct:
-                break
             already_seen[pages[i]] = i
+            if not correct:
+                i = 0
+                already_seen.clear()
+                correct = True
+            else:
+                i = i + 1
+        if not was_correct:
+            result = result + int(pages[len(pages) // 2])
     print(result)
 
 part2()
