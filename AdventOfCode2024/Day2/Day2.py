@@ -26,8 +26,8 @@ for line in puzzle_input_file:
 
 print(nb_safe)
 
-def check_diff_array(local_diff_array):
-    print(local_diff_array)
+def is_safe(local_diff_array):
+    #print(local_diff_array)
     prev_diff = 0
     for i in range(0, len(local_diff_array)):
         abs_local_diff = abs(local_diff_array[i])
@@ -40,19 +40,14 @@ def check_diff_array(local_diff_array):
             return i
     return -1
 
-def check_left(local_diff_array, check_index):
-    new_val = local_diff_array[check_index - 1] + local_diff_array[check_index]
+def add_and_check(local_diff_array, check_index, side):
+    a = check_index if side == "left" else check_index + 1
+    b = check_index - 1 if side == "left" else check_index
+    new_val = local_diff_array[a] + local_diff_array[b]
     new_list = local_diff_array.copy()
-    new_list.pop(check_index)
-    new_list[check_index - 1] = new_val
-    return check_diff_array(new_list)
-
-def check_right(local_diff_array, check_index):
-    new_val = local_diff_array[check_index + 1] + local_diff_array[check_index]
-    new_list = local_diff_array.copy()
-    new_list.pop(check_index + 1)
-    new_list[check_index] = new_val
-    return check_diff_array(new_list)
+    new_list.pop(a)
+    new_list[b] = new_val
+    return is_safe(new_list)
 
 puzzle_input_file = open("day2_input.txt", "r")
 
@@ -63,24 +58,15 @@ for line in puzzle_input_file:
     tokens = list(map(int, line.split()))
     for i in range(1, len(tokens)):
         diff_array.append(tokens[i] - tokens[i-1])
-    check = check_diff_array(diff_array)
-    if check <= 1 and check_diff_array(diff_array[1:]) < 0:
-        #print("Wrong first")
-        safe = True
-    elif check == (len(diff_array) - 1) and check_diff_array(diff_array[:-1]) < 0:
-        #print("Wrong last")
-        safe = True
-    elif check > -1:
-        if check == 0:
-            new_check = check
-        else:
-            new_check = check_left(diff_array, check)
-        if new_check > -1:
-            if check < (len(diff_array) - 1):
-                new_check = check_right(diff_array, check)
-                if new_check > -1:
-                    safe = False
-            else:
+    last_index = len(diff_array) - 1
+    check = is_safe(diff_array)
+    if check > -1:
+        if (check <= 1 and is_safe(diff_array[1:]) < 0) or (check == last_index and is_safe(diff_array[:-1]) < 0):
+            safe = True
+        elif check == 0 or add_and_check(diff_array, check, "left") > -1:
+            if check == last_index:
+                safe = False
+            elif add_and_check(diff_array, check, "right") > -1:
                 safe = False
     if safe:
         nb_safe = nb_safe + 1
